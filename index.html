@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats des Matchs</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Résultats des Matchs</h1>
+    <div id="matchesTable"></div>
+
+    <script>
+        function generateHtmlTable(jsonData) {
+            if (!jsonData || !jsonData.matches || jsonData.matches.length === 0) {
+                return '<p>Aucun match trouvé.</p>';
+            }
+
+            let html = '<table>';
+            html += '<thead><tr><th>Date</th><th>Match</th><th>Équipe à domicile</th><th>Équipe à l’extérieur</th><th>Ligue</th></tr></thead>';
+            html += '<tbody>';
+
+            jsonData.matches.forEach(match => {
+                html += `<tr>
+                    <td>${match.date}</td>
+                    <td>${match.match}</td>
+                    <td>${match.homeTeam}</td>
+                    <td>${match.awayTeam}</td>
+                    <td>${match.ligue}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        async function updateTable() {
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: 'Obtenez les résultats des matchs pour la semaine prochaine' })
+                });
+                const data = await response.json();
+                document.getElementById('matchesTable').innerHTML = generateHtmlTable(data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des données:', error);
+                document.getElementById('matchesTable').innerHTML = '<p>Erreur lors de la récupération des données.</p>';
+            }
+        }
+
+        updateTable();
+    </script>
+</body>
+</html>
