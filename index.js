@@ -11,7 +11,6 @@ const footballApiToken = '7663da8bd5e85cb6a86f6772e78752cc';
 
 let conversationState = {};
 
-// Fonction pour convertir le format de la date
 function convertDateFormat(dateStr) {
     const [day, month, year] = dateStr.split('/');
     return `${year}-${month}-${day}`;
@@ -40,7 +39,6 @@ async function askChatGPT(text, res) {
         let responseText = completion.choices[0].message.content.trim();
         console.log("Réponse brute de ChatGPT:", responseText);
 
-        // Nettoyer la réponse JSON
         if (responseText.startsWith('```json')) {
             responseText = responseText.replace('```json', '').trim();
         }
@@ -125,7 +123,6 @@ async function getMatchesForWeek(leagueName, startDate) {
 
         console.log("Réponse API football-data:", response.data);
 
-        // Assurer que les données sont disponibles et correctement formatées
         if (response.data && response.data.response) {
             return response.data.response.map(match => ({
                 date: match.fixture.date.split('T')[0],
@@ -177,7 +174,7 @@ app.post('/ask', async (req, res) => {
     await askChatGPT(text, res);
 });
 
-// Route pour afficher les matchs en tableau HTML
+// Route pour afficher les matchs en tableau
 app.get('/matches', async (req, res) => {
     const leagueName = req.query.league;
     const startDate = req.query.date;
@@ -185,20 +182,16 @@ app.get('/matches', async (req, res) => {
     
     const matchResults = await getMatchesForWeek(leagueName, startDate);
 
-    // Vérifiez ici que les données existent et sont correctement formatées
     console.log("Résultats des matchs JSON:", matchResults);
 
-    // Ajout des en-têtes HTTP pour désactiver le cache
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Pragma', 'no-cache');
 
-    // Transformation du JSON en tableau HTML
     let html = '<!DOCTYPE html><html><head><title>Matchs</title></head><body>';
     html += '<h1>Tableau des Matchs</h1>';
     html += '<table border="1">';
     html += '<tr><th>Date</th><th>Match</th><th>Équipe à domicile</th><th>Équipe à l’extérieur</th><th>Ligue</th></tr>';
 
-    // Générer les lignes du tableau en fonction des résultats des matchs
     matchResults.forEach(match => {
         html += `<tr>
                     <td>${match.date || 'N/A'}</td>
@@ -212,7 +205,6 @@ app.get('/matches', async (req, res) => {
     html += '</table>';
     html += '</body></html>';
 
-    // Envoi du HTML en réponse
     res.send(html);
 });
 
