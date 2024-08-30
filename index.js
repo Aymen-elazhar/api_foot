@@ -174,7 +174,6 @@ app.post('/ask', async (req, res) => {
     await askChatGPT(text, res);
 });
 
-// Route pour afficher les matchs en tableau
 app.get('/matches', async (req, res) => {
     const leagueName = req.query.league;
     const startDate = req.query.date;
